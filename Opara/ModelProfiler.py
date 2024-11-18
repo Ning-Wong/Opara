@@ -5,6 +5,7 @@ from torch.fx import Interpreter
 import torch._dynamo.eval_frame
 import os
     
+run_num = 1
 
 def profile(symbolic_traced, inputs, path):
 
@@ -24,7 +25,7 @@ def profile(symbolic_traced, inputs, path):
         with_stack=True,
         # with_flops=True
     ) as p:
-        for i in range(1):
+        for i in range(run_num):
             out_torch = interpreter.run(*inputs)
             # out_torch = model(*inputs)
             p.step()

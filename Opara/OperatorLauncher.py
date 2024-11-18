@@ -89,11 +89,13 @@ def get_resource_from_json(path):
     with open(path) as f:
         data = json.load(f)
 
-    step_num = 0
-    for event in data["traceEvents"]:
-        if "torch/fx/interpreter.py(97): run" in event["name"] and "run_node" not in event["name"]:
-            step_num += 1
+    # step_num = 0
+    # for event in data["traceEvents"]:
+    #     if "torch/fx/interpreter.py(97): run" in event["name"] and "run_node" not in event["name"]:
+    #         step_num += 1
     # print("step_num", step_num)
+
+    step_num = ModelProfiler.run_num
    
     # 获取run_node事件、kernel_launch事件、kernel事件
     run_node_events = []

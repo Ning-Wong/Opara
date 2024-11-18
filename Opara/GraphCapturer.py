@@ -81,11 +81,14 @@ def capturer(inputs, model, copy_outputs: bool = False):
     assert isinstance(inputs, (list, tuple)), f"inputs is of type {type(inputs)} instead of list"
     static_inputs = [torch.zeros_like(x, device='cuda') for x in inputs]
 
-    dynamo.reset()
-    with torch.no_grad():
-        explanation, out_guards, graphs, ops_per_graph, break_reasons, explanation_verbose = dynamo.explain(model, *inputs)
-    fx_module = graphs[0]
+    # dynamo.reset()
+    # with torch.no_grad():
+    #     explanation, out_guards, graphs, ops_per_graph, break_reasons, explanation_verbose = dynamo.explain(model, *inputs)
+    # fx_module = graphs[0]
     # print(fx_module.graph, file=output_file)
+
+    fx_module : torch.fx.GraphModule = torch.fx.symbolic_trace(model)
+
     fx_module.cuda()
     model_class_name = model.__class__.__name__
     OperatorLauncher.recompile(model_class_name, fx_module, inputs)
