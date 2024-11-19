@@ -44,15 +44,24 @@ def run_sequence_graph(symbolic_traced, inputs, iterations, warm_ups, start_inde
 
         time_list = []
         torch.cuda.synchronize()
-        for i in range(iterations):
-            start = torch.cuda.Event(enable_timing=True)  # the times
-            end = torch.cuda.Event(enable_timing=True)
-            start.record()
-            g1.replay()
-            end.record()
-            end.synchronize()
-            tim = start.elapsed_time(end)
-            time_list.append(tim)
+        with torch.profiler.profile(
+            # on_trace_ready=trace_handler,
+            activities=[
+                torch.profiler.ProfilerActivity.CPU,
+                torch.profiler.ProfilerActivity.CUDA,
+            ],
+            with_stack=True) as p:
+            for i in range(iterations):
+                start = torch.cuda.Event(enable_timing=True)  # the times
+                end = torch.cuda.Event(enable_timing=True)
+                start.record()
+                g1.replay()
+                end.record()
+                end.synchronize()
+                tim = start.elapsed_time(end)
+                time_list.append(tim)
+                p.step()
+        p.export_chrome_trace("/content/sequence.json")
         # print(time_list[start_index:end_index])
         average_time = np.mean(time_list[start_index: end_index])
         std = np.std(time_list[start_index: end_index])
@@ -84,7 +93,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
             tim = start.elapsed_time(end)
             time_list.append(tim)
             p.step()
-    p.export_chrome_trace("/content/trace.json")
+    p.export_chrome_trace("/content/parallel.json")
         
     average_time = np.mean(time_list[start_index: end_index])
     std = np.std(time_list[start_index: end_index])
