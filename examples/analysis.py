@@ -66,7 +66,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
 
     with torch.profiler.profile(
             schedule=torch.profiler.schedule(wait=1, warmup=1, active=2, repeat=1), 
-            on_trace_ready=torch.profiler.tensorboard_trace_handler('./log'), 
+            on_trace_ready=trace_handler, 
             record_shapes=True, 
             profile_memory=True, 
             with_stack=True) as prof:
@@ -82,24 +82,28 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
             end.synchronize()
             tim = start.elapsed_time(end)
             time_list.append(tim)
-
+            prof.step()
+        
     average_time = np.mean(time_list[start_index: end_index])
     std = np.std(time_list[start_index: end_index])
     output_str = ('Time of Opara:', str(average_time) + ' ms', "std: " + str(std) )
     print('{:<30} {:<20} {:<20}'.format(*output_str))
-    prof.export_chrome_trace("trace.json")
+    
     return output
 
 cache = torch.empty(int(4 * (1024 ** 2)), dtype=torch.int8, device='cuda')
 def flush_cache():
     cache.zero_()
 
+def trace_handler(p):
+    p.export_chrome_trace("trace.json")
+
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 DEVICE = os.environ.get("CUDA_VISIBLE_DEVICES")
 
 if __name__ == '__main__':
     warm_ups = 10
-    iterations = 30
+    iterations = 1
     x = torch.randint(low=0, high=256, size=(1, 3, 224, 224), dtype=torch.float32).to(device="cuda:0")
     model = torchvision.models.googlenet().eval()
 
