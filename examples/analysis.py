@@ -70,7 +70,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
             torch.profiler.ProfilerActivity.CPU,
             torch.profiler.ProfilerActivity.CUDA,
         ],
-        with_stack=True) as prof:
+        with_stack=True) as p:
 
         for i in range(iterations):
             flush_cache()
@@ -83,7 +83,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
             end.synchronize()
             tim = start.elapsed_time(end)
             time_list.append(tim)
-            prof.step()
+            p.step()
         
     average_time = np.mean(time_list[start_index: end_index])
     std = np.std(time_list[start_index: end_index])
