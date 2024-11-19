@@ -65,11 +65,12 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
     time_list = []
 
     with torch.profiler.profile(
-            schedule=torch.profiler.schedule(wait=1, warmup=1, active=2, repeat=1), 
-            on_trace_ready=trace_handler, 
-            record_shapes=True, 
-            profile_memory=True, 
-            with_stack=True) as prof:
+        on_trace_ready=trace_handler,
+        activities=[
+            torch.profiler.ProfilerActivity.CPU,
+            torch.profiler.ProfilerActivity.CUDA,
+        ],
+        with_stack=True) as prof:
 
         for i in range(iterations):
             flush_cache()
