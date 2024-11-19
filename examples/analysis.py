@@ -115,5 +115,5 @@ if __name__ == '__main__':
     res = output[0]
     if res.dtype == torch.float16:
         res = res.float()
-    print("output of PyTorch == output of Opara:", torch.allclose(y, res,rtol=1e-05,atol=1e-05,equal_nan =False), end='     ')
-    print('Absolute difference:', torch.max(torch.abs(y.detach() - res.detach())))
+    # print("output of PyTorch == output of Opara:", torch.allclose(y, res,rtol=1e-05,atol=1e-05,equal_nan =False), end='     ')
+    # print('Absolute difference:', torch.max(torch.abs(y.detach() - res.detach())))
