@@ -65,7 +65,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
     time_list = []
 
     with torch.profiler.profile(
-        on_trace_ready=trace_handler,
+        # on_trace_ready=trace_handler,
         activities=[
             torch.profiler.ProfilerActivity.CPU,
             torch.profiler.ProfilerActivity.CUDA,
@@ -84,6 +84,7 @@ def run_parallel_graph(Opara, inputs, iterations, warm_ups, start_index, end_ind
             tim = start.elapsed_time(end)
             time_list.append(tim)
             p.step()
+            p.export_chrome_trace("/content/trace.json")
         
     average_time = np.mean(time_list[start_index: end_index])
     std = np.std(time_list[start_index: end_index])
