@@ -96,7 +96,7 @@ def flush_cache():
     cache.zero_()
 
 def trace_handler(p):
-    p.export_chrome_trace("trace.json")
+    p.export_chrome_trace("/content/trace.json")
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 DEVICE = os.environ.get("CUDA_VISIBLE_DEVICES")
