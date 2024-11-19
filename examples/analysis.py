@@ -121,6 +121,8 @@ if __name__ == '__main__':
     inputs = (x,)
     model = model.to(device="cuda:0").eval()
 
+    run_sequence_graph(model, inputs, iterations, warm_ups, 0, 300)
+
     Opara = GraphCapturer.capturer(inputs, model)
     output = run_parallel_graph(Opara, inputs, iterations, warm_ups, 0, 300)
     res = output[0]
